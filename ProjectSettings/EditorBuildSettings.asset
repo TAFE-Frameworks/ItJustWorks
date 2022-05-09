@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes: 
+  - enabled: 1
+    path: Assets/ItJustWorks/Samples/AI/Pathfinding/PathfindingSamples.unity
+    guid: d68fb94b28001894c94e82eef59480e2
   m_configObjects: {}
