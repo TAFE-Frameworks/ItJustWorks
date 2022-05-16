@@ -1,38 +1,46 @@
-﻿using System.Collections.Generic;
-
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ItJustWorks.AI.AStar
 {
 	public class AStarPath
 	{
-		private readonly List<Vector3> path;
+		private readonly Vector3[] path;
 
 		private int index;
-		private float progress;
 
-		public AStarPath()
+		public AStarPath(Vector3[] _path)
 		{
-			path = new List<Vector3>();
+			path = _path;
 			index = 0;
-			progress = 0;
 		}
 
-		public void Add(Vector3 _node) => path.Add(_node);
+		public bool Progress(AStarAgent _agent)
+		{
+			// TODO: Add your logic here to follow the path and if it reaches the end of the path return false
+			if(index >= path.Length)
+				return false;
+			
+			Vector3 currentNode = path[index];
+			Vector3 position = Vector3.MoveTowards(_agent.Position, currentNode, _agent.moveSpeed * Time.deltaTime);
+			
+			if(_agent.Position == currentNode)
+				ProgressToNextNode();
 
-		public void Reverse() => path.Reverse();
+			_agent.Position = position;
+			
+			return true;
+		}
 
 		private void ProgressToNextNode()
 		{
 			index++;
-			progress = 0;
 		}
 
 		public void Visualise(LineRenderer _pathRenderer)
 		{
-			_pathRenderer.positionCount = path.Count;
+			_pathRenderer.positionCount = path.Length;
 
-			for(int i = 0; i < path.Count; i++)
+			for(int i = 0; i < path.Length; i++)
 			{
 				_pathRenderer.SetPosition(i, path[i]);
 			}

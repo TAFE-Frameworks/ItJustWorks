@@ -19,9 +19,16 @@ namespace ItJustWorks.Tests
         [UnityTest]
         public IEnumerator FindAStarPathTest()
         {
-            AStarPath path = AStarManager.Instance.FindPath(new Vector3(-10, 1, -10), new Vector3(10, 1, 10));
+            AStarPath path = null;
+            //AStarPath path = AStarManager.Instance.FindPath(new Vector3(-10, 1, -10), new Vector3(10, 1, 10));
+            AStarPathRequest request = new AStarPathRequest(new Vector3(-10, 1, -10), new Vector3(10, 1, 10), (_path, _success) =>
+            {
+                Debug.Assert(_success, "Failed to find path... Request path returned false on _success.");
+                path = _path;
+            });
+            AStarRequestManager.RequestPath(request);
             
-            yield return null;
+            yield return new WaitForSeconds(1);
             
             Debug.Assert(path != null, "Unable to find path between points.");
         }

@@ -22,7 +22,7 @@ namespace ItJustWorks.Samples.AI.Pathfinding
 					}
 					else
 					{
-						AStarManager.Instance.FindPath(initialClick, hit.point).Visualise(pathRenderer);
+						//AStarManager.Instance.FindPath(initialClick, hit.point).Visualise(pathRenderer);
 						initialClick = Vector3.positiveInfinity;
 					}
 				}
