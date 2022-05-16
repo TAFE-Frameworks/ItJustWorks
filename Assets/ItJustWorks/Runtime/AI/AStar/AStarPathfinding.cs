@@ -11,19 +11,26 @@ namespace ItJustWorks.AI.AStar
 	{
 		[SerializeField] private AStarGrid grid = new AStarGrid();
 
+		private Vector3 worldBottomLeft;
+
 		#region FUNCTIONALITY
 
 		public void FindPath(AStarPathRequest _request, Action<AStarPathResult> _callback)
 		{
 			Vector3[] nodes = Array.Empty<Vector3>();
 			bool pathFound = false;
+			
+			AStarGrid newGrid = AStarGrid.Copy(grid);
+			newGrid.Prepare();
+			newGrid.CreateGrid(worldBottomLeft);
 
-			AStarNode startNode = grid.NodeFromWorldPoint(_request.start);
-			AStarNode endNode = grid.NodeFromWorldPoint(_request.end);
+			AStarNode startNode = newGrid.NodeFromWorldPoint(_request.start);
+			AStarNode endNode = newGrid.NodeFromWorldPoint(_request.end);
 
 			if(startNode.walkable && endNode.walkable)
 			{
-				Heap<AStarNode> openSet = new Heap<AStarNode>(grid.MaxSize);
+				
+				Heap<AStarNode> openSet = new Heap<AStarNode>(newGrid.MaxSize);
 				HashSet<AStarNode> closedSet = new HashSet<AStarNode>();
 				openSet.Add(startNode);
 
@@ -40,7 +47,7 @@ namespace ItJustWorks.AI.AStar
 					}
 
 					// Visit all neighbours to this node
-					foreach(AStarNode neighbour in grid.GetNeighbours(current))
+					foreach(AStarNode neighbour in newGrid.GetNeighbours(current))
 					{
 						// Check if we have already visited this neighbour, or we can't walk on it
 						if(!neighbour.walkable || closedSet.Contains(neighbour))
@@ -126,7 +133,13 @@ namespace ItJustWorks.AI.AStar
 		private void Awake()
 		{
 			grid.Prepare();
-			grid.CreateGrid(transform);
+			worldBottomLeft = transform.position - Vector3.right * grid.WorldGridSize.x / 2 - Vector3.forward * grid.WorldGridSize.y / 2;
+			grid.CreateGrid(worldBottomLeft);
+		}
+
+		private void Update()
+		{
+			grid.CreateGrid(worldBottomLeft);
 		}
 
 		private void OnDrawGizmos()

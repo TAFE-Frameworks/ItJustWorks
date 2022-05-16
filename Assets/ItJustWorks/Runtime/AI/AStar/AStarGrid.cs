@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ItJustWorks.Threading.Physics;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -17,10 +19,20 @@ namespace ItJustWorks.AI.AStar
 		
 		[SerializeField] private Vector2 worldGridSize;
 		[SerializeField] private float nodeRadius;
-		[SerializeField] private LayerMask unwalkableLayers;
 
 		private AStarNode[,] grid;
 		private Vector2Int gridSize;
+
+		public static AStarGrid Copy(AStarGrid _toCopy)
+		{
+			AStarGrid newGrid = new AStarGrid
+			{
+				worldGridSize = _toCopy.worldGridSize,
+				nodeRadius = _toCopy.nodeRadius
+			};
+
+			return newGrid;
+		}
 
 		public void Prepare()
 		{
@@ -33,18 +45,17 @@ namespace ItJustWorks.AI.AStar
 			Ready = true;
 		}
 
-		public void CreateGrid(Transform _manager)
+		public void CreateGrid(Vector3 _worldBottomLeft)
 		{
 			grid = new AStarNode[gridSize.x, gridSize.y];
-			Vector3 worldBottomLeft = _manager.position - Vector3.right * worldGridSize.x / 2 - Vector3.forward * worldGridSize.y / 2;
-
+			
 			for(int x = 0; x < gridSize.x; x++)
 			{
 				for(int y = 0; y < gridSize.y; y++)
 				{
-					Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * NodeDiameter + nodeRadius) + Vector3.forward * (y * NodeDiameter + nodeRadius);
+					Vector3 worldPoint = _worldBottomLeft + Vector3.right * (x * NodeDiameter + nodeRadius) + Vector3.forward * (y * NodeDiameter + nodeRadius);
 
-					bool walkable = !Physics.CheckSphere(worldPoint, nodeRadius, unwalkableLayers);
+					bool walkable = !ThreadedPhysics.OverlapsAny(worldPoint, nodeRadius);
 					grid[x, y] = new AStarNode(walkable, worldPoint, new Vector2Int(x, y));
 				}
 			}
